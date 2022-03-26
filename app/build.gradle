@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -29,15 +30,53 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    buildFeatures{
+        viewBinding true
+    }
+
+    buildTypes.each {
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file("key.properties").newDataInputStream())
+        def mapKey  = properties.getProperty("yandex_map_key", "")
+        it.buildConfigField "String", "MAP_KEY", mapKey
+    }
+
 }
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'com.google.android.material:material:1.5.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
-    testImplementation 'junit:junit:4.+'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    //Map Yandex
+    implementation 'com.yandex.android:maps.mobile:4.0.0-lite'
+
+    // Design
+    implementation(Design.APPCOMPAT)
+    implementation(Design.MATERIAL)
+    implementation(Design.CONSTRAINT_LAYOUT)
+    implementation(Design.NAVIGATION_FRAGMENT)
+    implementation(Design.NAVIGATION_UI_KTX)
+
+    // LifeCycle
+    implementation(LifeCycle.LIVEDATA_KTX)
+    implementation(LifeCycle.VIEW_MODEL_KTX)
+
+    // ViewBindingPropertyDelegate
+    implementation(ViewBindingDelegate.DELEGATE)
+
+    // Room
+    kapt(Room.COMPILER)
+    implementation(Room.KTX)
+    implementation(Room.RUN_TIME)
+    annotationProcessor(Room.COMPILER)
+
+    // Koin
+    implementation(Koin.ANDROID)
+    implementation(Koin.ANDROID_COMPAT)
+    implementation(Koin.CORE)
+    implementation(Koin.TEST)
+    implementation(Koin.TEST_JUNIT4)
+
+    // Tests
+    testImplementation(Tests.JUNIT)
+    androidTestImplementation(Tests.TEST_EXT_JUNIT)
+    androidTestImplementation(Tests.ESPRESSO)
 }
